@@ -1,0 +1,174 @@
+class Product:
+    def __init__(self, name, price, quantity):
+        self.name = name
+        self.price = price
+        self.quantity = quantity
+
+    def __str__(self):
+        return f"{self.name} — {self.price:.2f} грн"
+
+
+class Shop:
+    def __init__(self):
+        self.products = [
+            Product("Ноутбук", 25000, 5),
+            Product("Смартфон", 12000, 10),
+            Product("Навушники", 1500, 15),
+            Product("Мишка", 800, 20),
+            Product("Клавіатура", 1800, 12)
+        ]
+
+        self.cart = []
+
+        # Лямбда-функція для форматування ціни
+        self.format_price = lambda price: f"{price:.2f} грн"
+
+    def show_catalog(self):
+        print("\n========== КАТАЛОГ ==========")
+
+        for i, product in enumerate(self.products, 1):
+            print(
+                f"{i}. {product.name} | "
+                f"{self.format_price(product.price)} | "
+                f"Залишок: {product.quantity}"
+            )
+
+    def add_to_cart(self):
+        self.show_catalog()
+
+        try:
+            number = int(input("\nВведіть номер товару: "))
+
+            if number < 1 or number > len(self.products):
+                print("Такого товару немає!")
+                return
+
+            product = self.products[number - 1]
+
+            if product.quantity <= 0:
+                print("Товару немає в наявності!")
+                return
+
+            self.cart.append(product)
+            product.quantity -= 1
+
+            print(f"Товар '{product.name}' додано до кошика.")
+
+        except ValueError:
+            print("Потрібно ввести число!")
+
+    def show_cart(self):
+        print("\n========== КОШИК ==========")
+
+        if not self.cart:
+            print("Кошик порожній.")
+            return
+
+        total = sum(map(lambda product: product.price, self.cart))
+
+        for i, product in enumerate(self.cart, 1):
+            print(
+                f"{i}. {product.name} — "
+                f"{self.format_price(product.price)}"
+            )
+
+        print("----------------------------")
+        print(f"Всього: {self.format_price(total)}")
+
+    def remove_from_cart(self):
+        self.show_cart()
+
+        if not self.cart:
+            return
+
+        try:
+            number = int(input("\nВведіть номер товару для видалення: "))
+
+            if number < 1 or number > len(self.cart):
+                print("Неправильний номер!")
+                return
+
+            product = self.cart.pop(number - 1)
+            product.quantity += 1
+
+            print(f"Товар '{product.name}' видалено з кошика.")
+
+        except ValueError:
+            print("Потрібно ввести число!")
+
+    def buy(self):
+        if not self.cart:
+            print("\nКошик порожній!")
+            return
+
+        total = sum(map(lambda product: product.price, self.cart))
+
+        self.show_cart()
+
+        print("\nПокупку успішно оформлено!")
+        print(f"Сума до оплати: {self.format_price(total)}")
+
+        self.cart.clear()
+
+    def admin(self):
+        password = input("\nВведіть пароль адміністратора: ")
+
+        if password != "admin123":
+            print("Неправильний пароль!")
+            return
+
+        print("\n========== АДМІНІСТРАТОР ==========")
+
+        for product in self.products:
+            print(
+                f"{product.name}: "
+                f"{product.quantity} шт. | "
+                f"{self.format_price(product.price)}"
+            )
+
+
+def main():
+    shop = Shop()
+
+    while True:
+        print("\n==============================")
+        print("       МІНІ-МАГАЗИН")
+        print("==============================")
+        print("1. Переглянути каталог")
+        print("2. Додати товар у кошик")
+        print("3. Переглянути кошик")
+        print("4. Видалити товар з кошика")
+        print("5. Купити товари")
+        print("6. Увійти як адміністратор")
+        print("0. Вийти")
+        print("==============================")
+
+        choice = input("Оберіть дію: ")
+
+        if choice == "1":
+            shop.show_catalog()
+
+        elif choice == "2":
+            shop.add_to_cart()
+
+        elif choice == "3":
+            shop.show_cart()
+
+        elif choice == "4":
+            shop.remove_from_cart()
+
+        elif choice == "5":
+            shop.buy()
+
+        elif choice == "6":
+            shop.admin()
+
+        elif choice == "0":
+            print("Дякую за покупку!")
+            break
+
+        else:
+            print("Невірний вибір. Спробуйте ще раз.")
+
+
+main()
